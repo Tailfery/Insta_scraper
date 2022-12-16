@@ -1,5 +1,5 @@
 import instaloader
-import re
+import helpers
 
 L = instaloader.Instaloader()
 
@@ -10,18 +10,26 @@ L = instaloader.Instaloader()
 #L.interative_login(USER)
 #L.load_session_from_file(USER)
 
+# List of usernames to download
+string_list = ["wraith________", "moss.meadows"]
+profile_list = []
+
+
 # Currently Hardcoded to Kaits profile - Change to list eventually
-profile = instaloader.Profile.from_username(L.context, "kait.drawsthings")
+for profile in string_list:
+    profile_list.append(instaloader.Profile.from_username(L.context, profile))
+
 
 # Download the profile and filter using regular expressions for the phrases books open, opening books, etc. 
 # Can clean this up later for a better regular expression but try this for now
+# Filter out closed for instances where it mentions both closed books but opening at a later date
 
-L.download_profiles(profile.get_posts(), 
-post_filter=lambda post: re.search("(books)+.*(open)+|(open)+.*(books)+|(opening)+.*(books)+|(books)+.*(opening)+", post.caption.lower()),
-max_count=1)
+L.download_profiles(profiles=profile_list,
+post_filter=lambda post: not "closed" in helpers.post_filter_helper(post))
 
-for post in profile.get_posts():
-    L.download_post(post, "kait.drawsthings")
+
+# for post in profile.get_posts():
+#    L.download_post(post, "kait.drawsthings")
 
 # Store data
 #profile.storeData()
