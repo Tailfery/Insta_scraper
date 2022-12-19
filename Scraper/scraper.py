@@ -4,7 +4,7 @@ import glob
 import shutil
 
 # Create an instaloader object to work wtih
-L = instaloader.Instaloader(rate_controller=instaloader.RateController.sleep(self=instaloader.RateController,secs=5.0))
+L = instaloader.Instaloader()
 
 # List of usernames to download
 string_list = ["wraith________", "moss.meadows"]
