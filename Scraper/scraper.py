@@ -1,10 +1,10 @@
 import instaloader
 import helpers
 import glob
-import os
+import shutil
 
 # Create an instaloader object to work wtih
-L = instaloader.Instaloader()
+L = instaloader.Instaloader(rate_controller=instaloader.RateController.sleep(self=instaloader.RateController,secs=5.0))
 
 # List of usernames to download
 string_list = ["wraith________", "moss.meadows"]
@@ -27,13 +27,15 @@ post_filter=lambda post: not "closed" in helpers.post_filter_helper(post),
 latest_stamps=instaloader.LatestStamps('./latest-stamps.ini'))
 
 #Check if post timestamp is equal to current one in the ini file and if its not then send the post
-# to the discord bot. Currently this is a messy way of doing it and the plan is to get rid of all files
-# after it posts to discord so it only needs to fetch the single .txt file in the folder.
+# to the discord bot. After the notification is sent we delete the directory to clean up the space
 for username in string_list:
     if post_timestamps[username] != instaloader.LatestStamps('./latest-stamps.ini').get_last_post_timestamp(username):
-        file_list = glob.glob('I:/Documents/Coding_Projects/Insta_scraper/Scraper/' + username +'/*.txt')
-        recent_file = min(file_list, key=os.path.getctime)
-        file = open(recent_file, 'r', encoding="utf8")
-        caption = file.read()
-        file.close()
+        path = 'I:/Documents/Coding_Projects/Insta_scraper/Scraper/'
+        recent_file = glob.glob(path + username +'/*.txt')
+        with open(recent_file.pop(), 'r', encoding="utf8") as file:
+            caption = file.read()
+        try:
+            shutil.rmtree(path + username)
+        except:
+            print("chump")
         helpers.discord_notify(caption, username)
